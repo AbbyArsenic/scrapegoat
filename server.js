@@ -9,8 +9,6 @@ const Note = require("./models/Note.js");
 // Scraping tools
 const request = require('request');
 const cheerio = require('cheerio');
-// Set mongoose to use es6 promises
-mongoose.Promise = Promise;
 
 // Initialize Express
 const app = express();
@@ -24,6 +22,8 @@ app.use(bodyParser.urlencoded({
 // Make public static directory
 app.use(express.static("public"));
 
+// Set mongoose to use es6 promises
+mongoose.Promise = Promise;
 // Configure mongoose database
 mongoose.connect("mongodb://localhost/scrapegoatdb");
 const db = mongoose.connection;
@@ -40,7 +40,7 @@ db.once("open", function() {
 
 // Routes
 
-// GET - scrape BBC tech news
+// GET - scrape cracked.com articles
 app.get("/scrape", function(req, res) {
   request("http://www.cracked.com/funny-articles.html", function(err, res, body) {
     const $ = cheerio.load(body);
@@ -63,7 +63,7 @@ app.get("/scrape", function(req, res) {
 
       const entry = new Article(result);
 
-    // Filter out duplicates before saving
+    // Save unique entries to database (model filters)
       entry.save(function(err, doc) {
         if (err) {
           console.log(err);
@@ -89,8 +89,11 @@ app.get("/articles", function(req, res) {
     });
 });
 
+// Route for grabbing a specific Article by id, populate it with it's note
 
-// Listen on port 3000
+// Route for saving/updating an Article's associated Note
+
+// Start server; Listen on port 3000
 app.listen(3000, function() {
   console.log("App running on port 3000!");
 });
