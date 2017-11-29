@@ -42,22 +42,28 @@ db.once("open", function() {
 
 // GET - scrape BBC tech news
 app.get("/scrape", function(req, res) {
-  request("http://www.bbc.com/news/technology", function(err, res, body) {
+  request("http://www.cracked.com/funny-articles.html", function(err, res, body) {
     const $ = cheerio.load(body);
-    $("h3.title-link__title").each(function(i, element) {
+    $("div.content-card-content").each(function(i, element) {
       // Save an empty result object
       const result = {};
 
       result.title = $(this)
-        .children("span.title-link__title-text")
+        .children("h3")
+        .children("a")
         .text();
-      result.link = "bbc.com" + 
-        $(this)
-        .parent("a")
+      result.link = $(this)
+        .children("h3")
+        .children("a")
         .attr("href");
-      
+      result.summary = $(this)
+        .children("p")
+        .children("a")
+        .text();
+
       const entry = new Article(result);
 
+    // Filter out duplicates before saving
       entry.save(function(err, doc) {
         if (err) {
           console.log(err);
@@ -74,6 +80,7 @@ app.get("/scrape", function(req, res) {
 app.get("/articles", function(req, res) {
   Article
     .find({})
+    .sort('-_id')
     .then(function(dbArticle) {
       res.json(dbArticle);
     })
