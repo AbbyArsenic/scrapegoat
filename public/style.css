@@ -1,5 +1,9 @@
 body { background-color: #F2F6D0 }
 
+button {
+  margin-left: 5px;
+}
+
 #wrapper {
-  padding-top: 40px;
+  padding-top: 50px;
 }

@@ -82,6 +82,8 @@ app.get("/scrape", function(req, res) {
       const entry = new Article(result);
 
     // Save unique entries to database (model filters)
+      // TODO: Handle cases of duplicate entries
+      // TODO: refresh page so it updates live
       entry.save(function(err, doc) {
         if (err) {
           console.log(err);
@@ -91,7 +93,7 @@ app.get("/scrape", function(req, res) {
       });
     });
   });
-  res.send("Scrape Complete.");
+  res.render("Scrape Complete.");
 });
 
 // Route to view all saved articles
@@ -102,7 +104,24 @@ app.get("/saved", function(req, res) {
     })
     .sort('-savedAt')
     .then(function(dbArticle) {
-      res.render("layouts/saved", { articles: dbArticle });
+      res.render("saved", { articles: dbArticle });
+    })
+    .catch(function(err) {
+      res.json(err);
+    });
+});
+
+// Route for updating an article to saved
+// BROKEN
+app.put("/save/:id", function(req, res) {
+  Article
+    .update({
+      '_id': [req.params.id]
+    }, {$set: {
+      'saved': true, 
+      'savedAt': Date.now()
+    }}, function() {
+      console.log("saved article!");
     })
     .catch(function(err) {
       res.json(err);

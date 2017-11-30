@@ -1,8 +1,36 @@
+$(function() {
+  
+  // Save article button ajax request
+  $("button#saveArticle").on("click", function(event) {
+    const thisId = $(this).parent("div").parent("div").attr("data-id");
+    //console.log("thisId: " + thisId);
+    
+    // Send UPDATE request
+    $.ajax("/save/" + thisId, {
+      type: "PUT"
+    }).then(
+      function() {
+        console.log("saved id: ", thisId);
+      }
+    );
+  });
 
-// Whenever someone clicks save for an article
-$(document).on("click", "button#saveArticle", function() {
-  // Grab the id from the parent panel div
-  var thisId = $(this).parent("div").parent("div").attr("data-id");
-  // Set this article to "saved"
+  // Scrape articles button ajax request
+  $("#scrapeBtn").on("click", function(event) {
+    $.ajax("/scrape", {
+      type: "GET"
+    }).then(
+      function() {
+        console.log("scrape button activated!");
+      });
+  });
+
+  // Add note button modal
+
+  // Save note ajax request
+
+  // Remove note ajax request
+
+  // Remove saved article button ajax request
 
 });
