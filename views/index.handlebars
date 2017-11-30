@@ -1,0 +1,32 @@
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">Scrapegoat</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li><a href="saved">Saved Articles</a></li>
+    </ul>
+    <button class="btn btn-danger navbar-btn pull-right">Scrape New Articles</button>
+  </div>
+</nav>
+
+<div class="container" id="wrapper">
+  <h1>Scrapegoat</h1>
+  <h3>Cracked.com Edition</h2>
+  <!-- Pass in data from server.js -->
+  <div>
+    {{#each articles}}
+      <div class='panel panel-default' data-id='{{this._id}}'>
+        <div class='panel-heading clearfix'> 
+          <h4 class='pull-left'>{{this.title}}</h4>
+          <button type='button' class='btn btn-success pull-right' id='saveArticle'>Save</button>
+        </div>
+        <div class='panel-body'>
+          <a href='{{this.link}}'>{{this.link}}</a>
+          <br />
+          {{this.summary}}
+        </div>
+      </div>
+    {{/each}}
+  </div>
+</div>

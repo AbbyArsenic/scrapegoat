@@ -13,14 +13,18 @@ const cheerio = require('cheerio');
 // Initialize Express
 const app = express();
 
-// Use body parser with app
-app.use(logger("dev"));
-app.use(bodyParser.urlencoded({
-  extended: false
-}));
-
 // Make public static directory
 app.use(express.static("public"));
+
+// Use body parser with app
+app.use(logger("dev"));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// Set up handlebars
+const exphbs = require("express-handlebars");
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
 
 // Set mongoose to use es6 promises
 mongoose.Promise = Promise;
@@ -38,7 +42,21 @@ db.once("open", function() {
   console.log("Mongoose connection successful.");
 });
 
+
 // Routes
+// =====================
+// Serve index.handlebars to the root route
+app.get("/", function(req, res) {
+  Article
+    .find({})
+    .sort('-_id')
+    .then(function(dbArticle) {
+      res.render("index", { articles: dbArticle });
+    })
+    .catch(function(err) {
+      res.json(err);
+    });
+});
 
 // GET - scrape cracked.com articles
 app.get("/scrape", function(req, res) {
@@ -76,13 +94,15 @@ app.get("/scrape", function(req, res) {
   res.send("Scrape Complete.");
 });
 
-// Route for getting all Articles from the db
-app.get("/articles", function(req, res) {
+// Route to view all saved articles
+app.get("/saved", function(req, res) {
   Article
-    .find({})
-    .sort('-_id')
+    .find({
+      'saved': true
+    })
+    .sort('-savedAt')
     .then(function(dbArticle) {
-      res.json(dbArticle);
+      res.render("layouts/saved", { articles: dbArticle });
     })
     .catch(function(err) {
       res.json(err);
