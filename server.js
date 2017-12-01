@@ -114,21 +114,24 @@ app.get("/saved", function(req, res) {
 // Route for updating an article to saved
 // BROKEN
 app.put("/save/:id", function(req, res) {
-  Article
-    .update({
-      '_id': [req.params.id]
-    }, {$set: {
-      'saved': true, 
-      'savedAt': Date.now()
-    }}, function() {
-      console.log("saved article!");
-    })
-    .catch(function(err) {
-      res.json(err);
+  console.log(req.params.id);
+  Article.findOneAndUpdate({ _id: req.params.id}, {$set: { saved: true }},
+    // .update({
+    //   _id: ObjectId("${req.params.id}")
+    // }, {$set: {
+    //   'saved': true
+    // }}
+    function (err, raw) {
+      if (err) {"Error:",console.log(err)}
+      console.log('The raw response from Mongo was ', raw);
+      res.send("successful");
     });
 });
 
 // Route for grabbing a specific Article by id, populate it with it's note
+app.get("/article/:id", function(req, res) {
+
+});
 
 // Route for saving/updating an Article's associated Note
 
