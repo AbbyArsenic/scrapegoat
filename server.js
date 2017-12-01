@@ -29,7 +29,9 @@ app.set("view engine", "handlebars");
 // Set mongoose to use es6 promises
 mongoose.Promise = Promise;
 // Configure mongoose database
-mongoose.connect("mongodb://localhost/scrapegoatdb");
+mongoose.connect("mongodb://localhost/scrapegoatdb",{
+  useMongoClient: true
+});
 const db = mongoose.connection;
 
 // Show any mongoose errors
@@ -78,6 +80,7 @@ app.get("/scrape", function(req, res) {
         .children("p")
         .children("a")
         .text();
+      result.saved = false;
 
       const entry = new Article(result);
 
@@ -115,12 +118,9 @@ app.get("/saved", function(req, res) {
 // BROKEN
 app.put("/save/:id", function(req, res) {
   console.log(req.params.id);
-  Article.findOneAndUpdate({ _id: req.params.id}, {$set: { saved: true }},
-    // .update({
-    //   _id: ObjectId("${req.params.id}")
-    // }, {$set: {
-    //   'saved': true
-    // }}
+  Article.findOneAndUpdate({ _id: req.params.id},
+    {$set: { saved: true }},
+    {new: true},
     function (err, raw) {
       if (err) {"Error:",console.log(err)}
       console.log('The raw response from Mongo was ', raw);
